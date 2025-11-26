@@ -67,5 +67,5 @@ jobs:
           
       - name: Terraform Apply
         if: success()           
-        run: terraform apply -input=false -auto-approve tfplan   
+        run: terraform apply -input=false -auto-approve  
     
