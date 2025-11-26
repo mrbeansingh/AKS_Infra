@@ -16,6 +16,7 @@ jobs:
 
         #---------- Authenticate to Azure using OIDC------------
         
+        
       - name: Azure Login with OIDC
         uses: azure/login@v2
         with:
