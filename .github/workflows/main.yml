@@ -35,15 +35,18 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init -input=false
+        working-directory: Env/Dev
 
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
+        working-directory: Env/Dev
 
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false
         continue-on-error: true  
+        working-directory: Env/Dev
 
   Terraform_apply: 
     name: Terraform Apply
@@ -67,5 +70,6 @@ jobs:
           
       - name: Terraform Apply
         if: success()           
-        run: terraform apply -input=false -auto-approve  
+        run: terraform apply -input=false -auto-approve 
+        working-directory: Env/Dev
     
