@@ -1,7 +1,6 @@
 name: Aks_cluster_infra
 on: workflow_dispatch
 permissions: 
-   actions: read
    id-token: write
    contents: read
 
@@ -13,10 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.0
         
-      - name: Install Terraform
-        uses: little-core-labs/install-terraform@v2.0.0
-        with:
-          version: 1.9.8
+     
 
         #---------- Authenticate to Azure using OIDC------------
         
@@ -26,27 +22,34 @@ jobs:
           client-id: 260f712d-d409-43c7-b0f6-b613525af877
           tenant-id: d8f47671-2a52-4a2e-badb-9fb565a090c1
           subscription-id: 10faea19-035c-4025-9136-201ca3e88e6d
+          
+      # - name: Install Terraform
+      #   uses: little-core-labs/install-terraform@v2.0.0
+      #   with:
+      #     version: 1.9.8    
 
           
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
-        continue-on-error: true    
+        continue-on-error: true 
+        working-directory: Env/Dev
+        
       - name: Terraform Init
         id: init
-        run: terraform -chdir=Env/Dev init -input=false
-        # working-directory: Env/Dev
+        run: terraform init -input=false
+        working-directory: Env/Dev
 
       - name: Terraform Validate
         id: validate
-        run: terraform -chdir=Env/Dev validate -no-color
-        # working-directory: Env/Dev
+        run: terraform validate -no-color
+        working-directory: Env/Dev
 
       - name: Terraform Plan
         id: plan
-        run: terraform -chdir=Env/Dev plan -no-color -input=false
+        run: terraform plan -no-color -input=false
         continue-on-error: true  
-        # working-directory: Env/Dev
+        working-directory: Env/Dev
 
   Terraform_apply: 
     name: Terraform Apply
@@ -56,10 +59,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.0
 
-      - name: Install Terraform
-        uses: little-core-labs/install-terraform@v2.0.0
-        with:
-          version: 1.9.8
+      # - name: Install Terraform
+      #   uses: little-core-labs/install-terraform@v2.0.0
+      #   with:
+      #     version: 1.9.8
 
       - name: Azure Login with OIDC
         uses: azure/login@v2
@@ -67,9 +70,15 @@ jobs:
           client-id: 260f712d-d409-43c7-b0f6-b613525af877
           tenant-id: d8f47671-2a52-4a2e-badb-9fb565a090c1
           subscription-id: 10faea19-035c-4025-9136-201ca3e88e6d   
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false  
+        working-directory: environments/dev    
           
       - name: Terraform Apply
-        if: success()           
-        run: terraform -chdir=Env/Dev apply -input=false -auto-approve 
-        # working-directory: Env/Dev
+        id: apply
+        # if: success()           
+        run: terraform apply -auto-approve 
+        continue-on-error: true 
+        working-directory: Env/Dev
     
