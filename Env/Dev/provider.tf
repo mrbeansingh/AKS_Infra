@@ -10,6 +10,8 @@ terraform {
     resource_group_name  = "backed-rg"
     key                  = "aks.tfstate"
     container_name       = "state-file-container"
+    use_oidc             = true
+    subscription_id      = "10faea19-035c-4025-9136-201ca3e88e6d"
 
   }
 }
