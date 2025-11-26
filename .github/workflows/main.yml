@@ -1,0 +1,71 @@
+name: Aks_cluster_infra
+on: workflow_dispatch
+permissions: 
+   actions: read
+   id-token: write
+   contents: read
+
+jobs: 
+  terraform-job:
+    name: terraform init plan fmt
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.0
+        
+      - name: Install Terraform
+        uses: little-core-labs/install-terraform@v2.0.0
+        with:
+          version: 1.9.8
+
+        #---------- Authenticate to Azure using OIDC------------
+        
+      - name: Azure Login with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+          
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true    
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+        continue-on-error: true  
+
+  Terraform_apply: 
+    name: Terraform Apply
+    runs-on: self-hosted
+    needs:  terraform-job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.0
+
+      - name: Install Terraform
+        uses: little-core-labs/install-terraform@v2.0.0
+        with:
+          version: 1.9.8
+
+      - name: Azure Login with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}    
+          
+      - name: Terraform Apply
+        if: success()           
+        run: terraform apply -input=false -auto-approve tfplan   
+    
