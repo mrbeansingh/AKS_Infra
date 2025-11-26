@@ -16,7 +16,7 @@ AKS = {
     resource_group_name = "dev-rg"
     dns_prefix          = "exampleaks1"
     tags = {
-      env   = "dev" 
+      env   = "dev"
       onwer = "aks_cluster"
     }
     identity_type = "SystemAssigned"
@@ -45,9 +45,9 @@ azure_acr = {
       g1 = {
         location                = "westus"
         zone_redundancy_enabled = true
-        tags ={
-          env = "dev"
-          onwer= "acr"
+        tags = {
+          env   = "dev"
+          onwer = "acr"
         }
 
 
